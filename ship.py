@@ -9,7 +9,6 @@ class Ship:
         self.image = pygame.image.load('images/player_ship.bmp')
         self.rect = self.image.get_rect()
         self.rect.midbottom = self.screen_rect.midbottom
-
     def blitme(self):
         """Show ship in actual position"""
         self.screen.blit(self.image, self.rect)
