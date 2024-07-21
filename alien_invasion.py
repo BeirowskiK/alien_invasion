@@ -14,8 +14,28 @@ class AlienInvasion:
         self.clock = pygame.time.Clock()
         self.settings = Settings()
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        # FULL SCREEN SETTINGS
+        # self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        # self.settings.screen_width = self.screen.get_rect().width
+        # self.settings.screen_height = self.screen.get_rect().height
         self.player_ship = Ship(self)
         pygame.display.set_caption("Alien Invasion")
+
+    def _check_keydown_events(self, event):
+        """Processing keydown event"""
+        if event.key == pygame.K_RIGHT:
+            self.player_ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.player_ship.moving_left = True
+        elif event.key == pygame.K_q:
+            sys.exit()
+
+    def _check_keyup_events(self, event):
+        """Processing keyup event"""
+        if event.key == pygame.K_RIGHT:
+            self.player_ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.player_ship.moving_left = False
 
     def _check_events(self):
         """Reaction for keyboard and mouse events"""
@@ -24,16 +44,9 @@ class AlienInvasion:
                 sys.exit()
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    self.player_ship.moving_right = True
-                elif event.key == pygame.K_LEFT:
-                    self.player_ship.moving_left = True
-
+                self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_RIGHT:
-                    self.player_ship.moving_right = False
-                elif event.key == pygame.K_LEFT:
-                    self.player_ship.moving_left = False
+                self._check_keyup_events(event)
 
     def _update_screen(self):
         """Updateing screen"""
