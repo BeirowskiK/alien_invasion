@@ -1,8 +1,10 @@
 import sys
+from time import sleep
 
 import pygame
 
 from settings import Settings
+from game_stats import GameStats
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -16,6 +18,7 @@ class AlienInvasion:
 
         self.clock = pygame.time.Clock()
         self.settings = Settings()
+        self.stats = GameStats(self)
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         # [TODO] FULL SCREEN SETTINGS - add function
         # self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
@@ -24,6 +27,7 @@ class AlienInvasion:
         self.player_ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.game_active = True
         pygame.display.set_caption("Alien Invasion")
 
         self._create_fleet()
@@ -79,6 +83,11 @@ class AlienInvasion:
         self._check_fleet_edges()
         self.aliens.update()
 
+        if pygame.sprite.spritecollideany(self.player_ship, self.aliens):
+            self._ship_hit()
+
+        self._check_aliens_bottom()
+
     def _create_fleet(self):
         """Create aliens fleet"""
         alien = Alien(self)
@@ -108,6 +117,13 @@ class AlienInvasion:
                 self._change_fleet_direction()
                 break
 
+    def _check_aliens_bottom(self):
+        """Reaction for reached bottom eadge by alien"""
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= self.settings.screen_height:
+                self._ship_hit()
+                break
+
     def _change_fleet_direction(self):
         """Move fleet down and change direction"""
         for alien in self.aliens.sprites():
@@ -132,13 +148,30 @@ class AlienInvasion:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
 
+    def _ship_hit(self):
+        """Reaction for collision alien with player's ship"""
+        if self.stats.ships_left > 0:
+            self.stats.ships_left -= 1
+            self.bullets.empty()
+            self.aliens.empty()
+
+            self._create_fleet()
+            self.player_ship.center_ship()
+
+            sleep(0.5)
+        else:
+            self.game_active = False
+
     def run_game(self):
         """Main game loop"""
         while True:
             self._check_events()
-            self.player_ship.update()
-            self._update_bullets()
-            self._update_aliens()
+
+            if self.game_active:
+                self.player_ship.update()
+                self._update_bullets()
+                self._update_aliens()
+
             self._update_screen()
             self.clock.tick(60)
 
