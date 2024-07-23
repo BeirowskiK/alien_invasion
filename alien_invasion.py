@@ -5,6 +5,7 @@ import pygame
 
 from settings import Settings
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 from ship import Ship
 from bullet import Bullet
@@ -19,8 +20,9 @@ class AlienInvasion:
 
         self.clock = pygame.time.Clock()
         self.settings = Settings()
-        self.stats = GameStats(self)
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        self.stats = GameStats(self)
+        self.scoreboard = Scoreboard(self)
         # [TODO] FULL SCREEN SETTINGS - add function
         # self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         # self.settings.screen_width = self.screen.get_rect().width
@@ -73,6 +75,9 @@ class AlienInvasion:
 
         if button_clicked and not self.game_active:
             self.stats.reset_stats()
+            self.scoreboard.prep_score()
+            self.scoreboard.prep_level()
+            self.scoreboard.prep_ships()
             self.settings.initialize_dynamic_settings()
             self.game_active = True
 
@@ -98,11 +103,20 @@ class AlienInvasion:
         """Checking bullets collision with aliens"""
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
+            self.scoreboard.prep_score()
+            self.scoreboard.check_high_score()
+
         # Create new fleet after destroy all aliens
         if not self.aliens:
             self.bullets.empty()
             self.settings.increase_speed()
             self._create_fleet()
+
+            self.stats.level += 1
+            self.scoreboard.prep_level()
 
     def _update_aliens(self):
         """Updating aliens position on screen"""
@@ -164,6 +178,7 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.aliens.draw(self.screen)
+        self.scoreboard.draw_score()
         if not self.game_active:
             self.play_button.draw_button()
 
@@ -181,6 +196,7 @@ class AlienInvasion:
         """Reaction for collision alien with player's ship"""
         if self.stats.ships_left > 0:
             self.stats.ships_left -= 1
+            self.scoreboard.prep_ships()
             self.bullets.empty()
             self.aliens.empty()
 
