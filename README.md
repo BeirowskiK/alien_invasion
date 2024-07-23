@@ -13,8 +13,8 @@ You are the only hope to save the world from alien invasion!
 
 
 # Screenshots
-![enter image description here](https://chmura.kelek.kartuzy.pl/index.php/s/Z9GNTWsxKDZ628G/preview)
-![enter image description here](https://chmura.kelek.kartuzy.pl/index.php/s/oc2EatBJmQNK24y/preview)
+![enter image description here](https://chmura.kelek.kartuzy.pl/index.php/s/9k9M2azaZ3Bncci/preview)
+![enter image description here](https://chmura.kelek.kartuzy.pl/index.php/s/G7asHMrpbNX2ifq/preview)
 
 
 
