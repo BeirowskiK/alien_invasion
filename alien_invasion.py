@@ -5,6 +5,7 @@ import pygame
 
 from settings import Settings
 from game_stats import GameStats
+from button import Button
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -27,7 +28,9 @@ class AlienInvasion:
         self.player_ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
-        self.game_active = True
+        self.game_active = False
+        self.play_button = Button(self, "Play")
+
         pygame.display.set_caption("Alien Invasion")
 
         self._create_fleet()
@@ -60,6 +63,27 @@ class AlienInvasion:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_position = pygame.mouse.get_pos()
+                self._check_play_button(mouse_position)
+
+    def _check_play_button(self, mouse_pos):
+        """Run game after click play button"""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+
+        if button_clicked and not self.game_active:
+            self.stats.reset_stats()
+            self.game_active = True
+
+            self.bullets.empty()
+            self.aliens.empty()
+
+            self._create_fleet()
+            self.player_ship.center_ship()
+
+            #Hide mouse cursor
+            pygame.mouse.set_visible(False)
+
 
     def _update_bullets(self):
         """Updating bullets position on screen, deleting invisible bullets"""
@@ -138,9 +162,12 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.aliens.draw(self.screen)
+        if not self.game_active:
+            self.play_button.draw_button()
 
         self.player_ship.blitme()
         pygame.display.flip()
+
 
     def _fire_bullet(self):
         """Create new bullet and append to the group"""
@@ -161,6 +188,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.game_active = False
+            pygame.mouse.set_visible(True)
 
     def run_game(self):
         """Main game loop"""
