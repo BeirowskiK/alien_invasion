@@ -73,6 +73,7 @@ class AlienInvasion:
 
         if button_clicked and not self.game_active:
             self.stats.reset_stats()
+            self.settings.initialize_dynamic_settings()
             self.game_active = True
 
             self.bullets.empty()
@@ -100,6 +101,7 @@ class AlienInvasion:
         # Create new fleet after destroy all aliens
         if not self.aliens:
             self.bullets.empty()
+            self.settings.increase_speed()
             self._create_fleet()
 
     def _update_aliens(self):
